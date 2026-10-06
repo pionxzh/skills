@@ -1,0 +1,4 @@
+interface:
+  display_name: "Read Codex Session"
+  short_description: "Read and summarize local Codex sessions"
+  default_prompt: "Use $read-codex-session to read a Codex session and answer my questions about it."
