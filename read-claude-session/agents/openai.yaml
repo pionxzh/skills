@@ -1,0 +1,4 @@
+interface:
+  display_name: "Read Claude Session"
+  short_description: "Read and summarize local Claude Code sessions"
+  default_prompt: "Use $read-claude-session to read a Claude Code session and answer my questions about it."
