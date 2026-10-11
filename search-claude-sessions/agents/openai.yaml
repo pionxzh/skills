@@ -1,0 +1,4 @@
+interface:
+  display_name: "Search Claude Sessions"
+  short_description: "Full-text search across local Claude Code sessions"
+  default_prompt: "Use $search-claude-sessions to find where we discussed or did this in a past Claude Code session."
