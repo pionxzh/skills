@@ -375,22 +375,10 @@ def index_file(conn: sqlite3.Connection, path: Path) -> int:
 
 
 def refresh(conn: sqlite3.Connection, dirs: list[Path], verbose: bool = False) -> int:
+    # Rows of transcripts that no longer exist are kept on purpose: Claude
+    # Code deletes JSONL files after cleanupPeriodDays (30 by default), and
+    # the index is then the only copy of those sessions.
     files = transcript_files(dirs)
-    present = {str(path) for path in files}
-    projects = [directory.name for directory in dirs]
-    marks = ",".join("?" * len(projects))
-    stale = [
-        row["path"]
-        for row in conn.execute(
-            f"SELECT path FROM files WHERE project IN ({marks})", projects
-        )
-        if row["path"] not in present
-    ]
-    for path in stale:
-        conn.execute("DELETE FROM messages WHERE path = ?", (path,))
-        conn.execute("DELETE FROM files WHERE path = ?", (path,))
-    conn.commit()
-
     total = 0
     for path in files:
         try:
@@ -514,8 +502,10 @@ def cmd_index(args: argparse.Namespace) -> None:
     db_path = Path(args.db).expanduser() if args.db else default_db_path()
     conn = open_db(db_path)
     if args.rebuild:
-        conn.executescript("DELETE FROM messages; DELETE FROM files;")
-        conn.execute("INSERT INTO messages_fts(messages_fts) VALUES('optimize')")
+        # Re-read transcripts that still exist; keep rows of deleted ones.
+        for path in transcript_files(dirs):
+            conn.execute("DELETE FROM messages WHERE path = ?", (str(path),))
+            conn.execute("DELETE FROM files WHERE path = ?", (str(path),))
         conn.commit()
     if not args.stats:
         added = refresh(conn, dirs, verbose=True)

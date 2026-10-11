@@ -57,7 +57,7 @@ Use `detail` on a `tool` row to recover the exact command or query that ran and 
 ```bash
 python3 <skill-dir>/scripts/session_search.py recent 10     # latest turns, newest last
 python3 <skill-dir>/scripts/session_search.py index --all-projects   # refresh + per-project stats
-python3 <skill-dir>/scripts/session_search.py index --rebuild        # re-index the scope from scratch
+python3 <skill-dir>/scripts/session_search.py index --rebuild        # re-read the scope's transcripts
 ```
 
 ## Workflow
@@ -74,6 +74,6 @@ python3 <skill-dir>/scripts/session_search.py index --rebuild        # re-index 
 - Tool calls: Bash description and command, file paths for Read, Write, and Edit, Agent description and prompt, and compact JSON input for other tools, MCP tools included.
 - Not indexed: tool results (use `detail`) and subagent transcripts under `<session>/subagents/`. The parent session records the Agent call and the reply that summarized the subagent's result.
 
-The index lives at `~/.cache/claude-session-search/index.db` (`$XDG_CACHE_HOME` and `CLAUDE_SESSION_SEARCH_DB` override it). Deleting it is safe; the next run rebuilds it.
+The index lives at `~/.cache/claude-session-search/index.db` (`$XDG_CACHE_HOME` and `CLAUDE_SESSION_SEARCH_DB` override it). Claude Code deletes transcripts after `cleanupPeriodDays` (30 by default). The index keeps rows of deleted transcripts, so it is the only copy of those sessions: do not delete it casually. `detail` needs the JSONL and does not work for them.
 
 Transcripts can hold secrets and personal content. Quote only what the current request needs, and never reproduce credentials found in a hit.
