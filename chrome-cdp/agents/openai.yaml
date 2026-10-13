@@ -1,0 +1,4 @@
+interface:
+  display_name: "Chrome CDP"
+  short_description: "Drive a dedicated, logged-in Chrome over CDP"
+  default_prompt: "Use $chrome-cdp to drive a dedicated Chrome on this site."
