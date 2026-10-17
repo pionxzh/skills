@@ -51,7 +51,7 @@ CDP_PORT=9223 CHROME_PROFILE=~/.chrome-<purpose> START_URL=https://example.com s
 | `eval.mjs -e "<body>"` / `eval.mjs file.js` | Run an async function body in the page; `return` gives the result |
 | `click.mjs "<text>" [--selector css] [--hover]` | Trusted click or hover on the first visible element with that exact text, scrolled into view; fails when something covers it |
 | `type.mjs <selector> [--text ...] [--clear] [--enter]` | Trusted typing; reads the text from stdin by default |
-| `shot.mjs [out.png] [--full]` | Screenshot the viewport or the whole page |
+| `shot.mjs [out.png] [--full]` | Screenshot the viewport or the whole page; default `<tmp>/chrome-cdp/shot.png`, prints the path |
 | `download.mjs -e "<body>" [--out dir]` | Trigger a download in the page and collect the file |
 | `console.mjs [--seconds 5] [-e "<body>"]` | Print console messages, exceptions and browser errors (CSP, failed loads); replays what Chrome kept, then listens |
 | `net-capture.mjs [--seconds N] [--out f.jsonl]` | Record XHR / fetch with bodies and WebSocket frames to JSONL |
