@@ -52,6 +52,19 @@ Claude Code and Codex. Needs Node 22+ and Chrome.
 npx skills add pionxzh/skills -g -s chrome-cdp
 ```
 
+## consider
+
+Second opinion on a decision you are about to commit to: restates it with
+its hidden assumptions, ranks blind spots, runs a pre-mortem, and ends with
+a recommendation. Runs only when you invoke it (`/consider`).
+
+Install it for Claude Code only: `disable-model-invocation` is a Claude Code
+setting, so another agent could start it on its own.
+
+```bash
+npx skills add pionxzh/skills -g -s consider -a claude-code --copy
+```
+
 ## Update
 
 Skills install with [`npx skills`](https://www.npmjs.com/package/skills).
