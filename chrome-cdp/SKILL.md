@@ -1,6 +1,6 @@
 ---
 name: chrome-cdp
-description: Drive a real Chrome over the DevTools Protocol (CDP) with small zero-dependency Node scripts — start a dedicated Chrome with its own profile, navigate, run JavaScript in the page, trusted click / hover / typing, screenshots, downloads, network and WebSocket capture, and dumping the page's loaded scripts. Use when a task needs a logged-in or extension-equipped browser session on a live site, when headless automation gets blocked, or when you need to inspect what a web app actually sends and loads.
+description: Drive a real Chrome over the DevTools Protocol (CDP) with small zero-dependency Node scripts — start a dedicated Chrome with its own profile, navigate, run JavaScript in the page, trusted click / hover / typing, screenshots, downloads, console logs, network and WebSocket capture, and dumping the page's loaded scripts. Use when a task needs a logged-in or extension-equipped browser session on a live site, when headless automation gets blocked, or when you need to inspect what a web app actually sends and loads.
 ---
 
 # Chrome over CDP
@@ -49,10 +49,11 @@ CDP_PORT=9223 CHROME_PROFILE=~/.chrome-<purpose> START_URL=https://example.com s
 | `tabs.mjs` | List tabs; `*` marks the one the other scripts drive |
 | `goto.mjs <url>` | Navigate and wait for the load event |
 | `eval.mjs -e "<body>"` / `eval.mjs file.js` | Run an async function body in the page; `return` gives the result |
-| `click.mjs "<text>" [--selector css] [--hover]` | Trusted click or hover on the first visible element with that exact text, scrolled into view |
+| `click.mjs "<text>" [--selector css] [--hover]` | Trusted click or hover on the first visible element with that exact text, scrolled into view; fails when something covers it |
 | `type.mjs <selector> [--text ...] [--clear] [--enter]` | Trusted typing; reads the text from stdin by default |
 | `shot.mjs [out.png] [--full]` | Screenshot the viewport or the whole page |
 | `download.mjs -e "<body>" [--out dir]` | Trigger a download in the page and collect the file |
+| `console.mjs [--seconds 5] [-e "<body>"]` | Print console messages, exceptions and browser errors (CSP, failed loads); replays what Chrome kept, then listens |
 | `net-capture.mjs [--seconds N] [--out f.jsonl]` | Record XHR / fetch with bodies and WebSocket frames to JSONL |
 | `dump-scripts.mjs <regex> [out-dir]` | Save every parsed script (lazy chunks, inline) whose source matches |
 
@@ -70,7 +71,15 @@ a flow repeats, rather than growing a long `eval.mjs -e` string.
   CDP `Input.*` events, which count as user gestures. Use them for hover
   menus, popups, file pickers, framework-controlled inputs and anything
   that ignores synthetic events. A plain `el.click()` through `eval.mjs`
-  is fine for ordinary buttons and links.
+  is fine for ordinary buttons and links. A trusted click lands on
+  whatever is on top, so `click.mjs` refuses when a menu or modal left
+  open covers the target.
+- **Dialogs.** Every script answers JavaScript dialogs and prints each one
+  to stderr as `[dialog] ...`. Alerts and `beforeunload` are accepted;
+  `confirm` and `prompt` are dismissed unless `CDP_DIALOG=accept`. A dialog
+  that opens while no script is connected blocks the page, and a later
+  connection cannot answer it: close the tab
+  (`curl -s http://127.0.0.1:$CDP_PORT/json/close/<id>`) and open a new one.
 - **Secrets.** Pipe passwords into `type.mjs` from the keychain or a secret
   store (`security find-generic-password -s <name> -w | node scripts/type.mjs "input[type=password]"`).
   Never pass them with `--text`, `eval.mjs` or in a file.

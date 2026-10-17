@@ -77,5 +77,19 @@ export async function connect({ target = 'page' } = {}) {
     /** Run the body of an async function in the page. `return` gives the result. */
     const run = body => evaluate(`(async () => { ${body} })()`)
 
+    // A dialog blocks the page, and only a session that had Page enabled when
+    // it opened can answer it. So every session answers them: alerts and
+    // beforeunload are accepted, confirm and prompt are dismissed unless
+    // CDP_DIALOG=accept, so a script never confirms a destructive action by
+    // accident.
+    if (target === 'page') {
+        on('Page.javascriptDialogOpening', ({ type, message }) => {
+            const accept = type === 'alert' || type === 'beforeunload' || process.env.CDP_DIALOG === 'accept'
+            console.error(`[dialog] ${type}: ${message} -> ${accept ? 'accept' : 'dismiss'}`)
+            send('Page.handleJavaScriptDialog', { accept })
+        })
+        await send('Page.enable')
+    }
+
     return { send, on, evaluate, run, close: () => ws.close() }
 }

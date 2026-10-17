@@ -28,10 +28,16 @@ try {
         el.scrollIntoView({ block: 'center', inline: 'center' })
         await new Promise(r => requestAnimationFrame(() => r()))
         const r = el.getBoundingClientRect()
-        return { x: r.x + r.width / 2, y: r.y + r.height / 2 }
+        const x = r.x + r.width / 2
+        const y = r.y + r.height / 2
+        // A trusted click lands on whatever is on top, such as an open menu or modal.
+        const top = document.elementFromPoint(x, y)
+        if (top && !el.contains(top)) return { covered: top.tagName.toLowerCase() + (top.className ? '.' + String(top.className).trim().split(/\\s+/).join('.') : '') }
+        return { x, y }
     `)
     const what = text ? `"${text}"` : sel
     if (!rect) throw new Error(`no visible element matching ${what}`)
+    if (rect.covered) throw new Error(`${what} is covered by ${rect.covered}; close it first`)
     const { x, y } = rect
     await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y })
     if (!hoverOnly) {
