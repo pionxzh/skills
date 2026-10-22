@@ -26,7 +26,7 @@ EOF
 - Pick a name that says what the job is; names are global across sessions, and `start` refuses an existing one.
 - `--image <file>` attaches an image (repeatable). `--model` and `--effort` override the Codex config; leave them unset unless the user asks.
 
-Write the prompt as a brief for a capable engineer who has none of your context: the goal, where to look, constraints (what not to touch, which commands not to run), how to verify, and what the final message must contain. One task per job. For image generation, tell Codex to use its image generation tool and save the result under a given file name in the working directory.
+Write the prompt as a brief for a capable engineer who has none of your context: the goal, where to look, constraints (what not to touch, which commands not to run), how to verify, and what the final message must contain. One task per job. For image generation, tell Codex to use its image generation tool and save the result under a given file name in the working directory. To edit an image, attach it with `--image` and say "EDIT mode": Codex then keeps the pose and framing closely enough to layer the result over the original. For a cut-out, ask for a flat #FF00FF background.
 
 ## While it runs
 
